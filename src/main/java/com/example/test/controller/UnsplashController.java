@@ -9,6 +9,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -16,9 +17,11 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
+import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -29,6 +32,19 @@ public class UnsplashController {
     private AuthorizeProperties authorizeProperties;
     @Autowired
     private UnsplashService unsplashService;
+
+    @GetMapping("code")
+    public String getCode () throws IOException, InterruptedException {
+        HttpClient.Builder builder = HttpClient.newBuilder();
+        HttpClient httpClient = builder.followRedirects(HttpClient.Redirect.ALWAYS).build();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://unsplash.com/oauth/authorize?client_id=ejcxMYgmWK3jRhq90P3UkVUDWWtsJ50DRCSqn4b_p10&redirect_uri=https://www.google.es&response_type=code&scope=public"))
+                .build();
+        HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        String path = httpResponse.request().uri().getPath();
+        return path;
+    }
+
 
 
     @GetMapping("collections")
